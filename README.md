@@ -2,7 +2,7 @@
 Simple script to open my favorite terminal [BlackBox](https://gitlab.gnome.org/raggesilver/blackbox) from Nautilus (Gnome Files) Menu
 ---
 <p align="center">
-  <img src="http://some_place.com/image.png" />
+  <img src="https://raw.githubusercontent.com/phucnoob/OpenInBlackBox/main/preview.png" />
 </p>
 
 
