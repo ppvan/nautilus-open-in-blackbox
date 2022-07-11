@@ -3,7 +3,7 @@
 restart_nautilus() {
     read -p "Restart Nautilus(Files)? [Y/n]" ans
 
-    if [[ $ans == 'y' || $ans == 'Y' || $ans == '']]; then
+    if [[ $ans == 'y' || $ans == 'Y' || $ans == '' ]]; then
         nautilus -q
     fi
 }
