@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-import os, subprocess
+import os, subprocess, sys
 from gi import require_version
 import urllib.parse
 require_version('Gtk', '3.0')
@@ -10,12 +10,25 @@ from gi.repository import Nautilus, GObject
 from gettext import gettext
 
 
-class BlackBoxNautilus(Nautilus.MenuProvider, GObject.GObject):
+class BlackBoxNautilus(GObject.GObject, Nautilus.MenuProvider):
     def __init__(self):
-        pass
+        self.window = None
+        self.is_selected = False
 
     def get_file_items(self, window, files):
-        pass
+        """Return to menu when click on any file/folder"""
+        if len(files) != 1:
+            self.is_selected = False
+            return
+
+        self.is_selected = True
+        file = files[0]
+        items = []
+        self.window = window
+        if file.is_directory() and file.get_uri_scheme() == "file":
+            items += [self._create_nautilus_item(file)]
+        return items
+
 
     def get_background_items(self, window, file):
         """Returns the menu items to display when no file/folder is selected
@@ -23,13 +36,18 @@ class BlackBoxNautilus(Nautilus.MenuProvider, GObject.GObject):
         # Add the menu items
         items = []
         self.window = window
+
+        if self.is_selected:
+            return
+
         if file.is_directory() and file.get_uri_scheme() == "file":
             items += [self._create_nautilus_item(file)]
         return items
 
     def _create_nautilus_item(self, file):
+        print(file.get_uri())
         """Creates the 'Open In BlackBox' menu item."""
-        item = Nautilus.MenuItem(name="BlackBoxNautilus::Nautilus",
+        item = Nautilus.MenuItem(name="BlackBoxNautilus::open_in_blackbox",
                                  label=gettext("Open in BlackBox"),
                                  tip=gettext("Open this folder/file in BlackBox Terminal"))
         item.connect("activate", self._nautilus_run, file)
@@ -40,4 +58,5 @@ class BlackBoxNautilus(Nautilus.MenuProvider, GObject.GObject):
         uri = file.get_uri()
         # uri = urllib.parse.unquote(uri)
         uri = uri.replace('file://','')
-        subprocess.run(['flatpak', 'run', 'com.raggesilver.BlackBox', '-w', uri])
+        print("Openning: ",uri)
+        subprocess.Popen(['flatpak', 'run', 'com.raggesilver.BlackBox', '-w', uri])
