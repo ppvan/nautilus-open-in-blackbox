@@ -3,8 +3,8 @@
 import os, subprocess, sys
 from gi import require_version
 import urllib.parse
-require_version('Gtk', '3.0')
-require_version('Nautilus', '3.0')
+require_version('Gtk', '4.0')
+require_version('Nautilus', '4.0')
 
 from gi.repository import Nautilus, GObject
 from gettext import gettext
@@ -12,10 +12,10 @@ from gettext import gettext
 
 class BlackBoxNautilus(GObject.GObject, Nautilus.MenuProvider):
     def __init__(self):
-        self.window = None
+        # self.window = None
         self.is_selected = False
 
-    def get_file_items(self, window, files):
+    def get_file_items(self, files):
         """Return to menu when click on any file/folder"""
         if len(files) != 1:
             self.is_selected = False
@@ -24,18 +24,18 @@ class BlackBoxNautilus(GObject.GObject, Nautilus.MenuProvider):
         self.is_selected = True
         file = files[0]
         items = []
-        self.window = window
+        #s elf.window = window
         if file.is_directory() and file.get_uri_scheme() == "file":
             items += [self._create_nautilus_item(file)]
         return items
 
 
-    def get_background_items(self, window, file):
+    def get_background_items(self, file):
         """Returns the menu items to display when no file/folder is selected
         (i.e. when right-clicking the background)."""
         # Add the menu items
         items = []
-        self.window = window
+        # self.window = window
 
         if self.is_selected:
             return
