@@ -63,6 +63,7 @@ if using_nautilus_43_onwards:
             """'Open with BlackBox 's menu item callback."""
             uri = file.get_uri()
             uri = uri.replace('file://','')
+            uri = urllib.parse.unquote(uri)
             print("Openning: ",uri)
             subprocess.Popen(['flatpak', 'run', 'com.raggesilver.BlackBox', '-w', uri])
 else:
@@ -113,5 +114,6 @@ else:
             """'Open with BlackBox 's menu item callback."""
             uri = file.get_uri()
             uri = uri.replace('file://','')
+            uri = urllib.parse.unquote(uri)
             print("Openning: ",uri)
             subprocess.Popen(['flatpak', 'run', 'com.raggesilver.BlackBox', '-w', uri])
