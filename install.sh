@@ -1,5 +1,7 @@
 #!/usr/bin/bash
 
+EXT_PATH=blackbox_extension.py
+
 restart_nautilus() {
     read -p "Restart Nautilus(Files)? [Y/n]" ans
 
@@ -9,7 +11,7 @@ restart_nautilus() {
 }
 
 install_user() {
-    path='open_in_blackbox.py'
+    path=$EXT_PATH
     target=~/.local/share/nautilus-python/extensions/
 
     if [[ ! -d $target ]]; then
@@ -22,7 +24,7 @@ install_user() {
 }
 
 install_sudo() {
-    path='open_in_blackbox.py'
+    path=$EXT_PATH
     target=/usr/share/nautilus-python/extensions/
 
     if [[ ! -d $target ]]; then
@@ -42,7 +44,7 @@ if [[ $(id -u) == 0 ]]; then
         echo -n "Skip install..."
     fi
 else
-    read -p "Install user-wide?[Y/n]" ans
+    read -p "Install OpenInBlackBox?[Y/n]" ans
     if [[ $ans == 'y' || $ans == 'Y' || $ans == '' ]]; then
         install_user
     else
