@@ -5,22 +5,17 @@ pkgver=1.0.0
 pkgrel=1
 pkgdesc="Open current directory in BlackBox from Nautilus context menu"
 arch=('any')
-url="https://github.com/ppvan/OpenInBlackBox"
+url="https://github.com/ppvan/nautilus-open-in-blackbox"
 license=('GPL3')
 depends=('python-nautilus>=4.0')
 makedepends=('git')
 
-_commit=6a6254b1b70a60efb65812fee60e3eedbff4c7f3
-source=("git+https://github.com/ppvan/OpenInBlackBox#commit=$_commit")
+_commit=e69a0093311d6b89b25a55044d4f820d16de72c9
+source=("git+https://github.com/ppvan/nautilus-open-in-blackbox#commit=$_commit")
 
 sha256sums=('SKIP')
 
-_dest='/usr/share/nautilus-python/extensions'
-
 package() {
-    cd "$srcdir/$pkgname"
-    mkdir -p "$_dest"
-    cp blackbox_extension.py "$_dest"
-
-    nautilus -q
+    cd "$pkgname"
+    install -Dm644 -t "$pkgdir/usr/share/nautilus-python/extensions" nautilus-open-in-blackbox.py
 }

@@ -19,10 +19,23 @@ sudo dnf install nautilus-python
 ```
 
 ## Installation
+
+### Arch Linux
+Install from AUR
+```
+yay -S nautilus-open-in-blackbox
+```
+Restart Nautilus
+```
+nautilus -q
+```
+
+### Other Disto
+
 Clone this repository and use the install script.
 ```
-git clone https://github.com/phucnoob/OpenInBlackBox.git
-cd OpenInBlackBox
+git clone https://github.com/ppvan/nautilus-open-in-blackbox.git
+cd nautilus-open-in-blackbox
 ./install.sh
 ```
 or install system-wide with sudo
