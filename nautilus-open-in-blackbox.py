@@ -79,7 +79,7 @@ class BlackBoxNautilus(GObject.GObject, Nautilus.MenuProvider):
         return item
 
     def is_native(self):
-        return shutil.which("blackbox") is not None
+        return shutil.which("blackbox") == "/usr/bin/blackbox"
 
     def _nautilus_run(self, menu, path):
         """'Open with BlackBox 's menu item callback."""
