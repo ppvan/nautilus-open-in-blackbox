@@ -1,16 +1,19 @@
 #!/usr/bin/python
 
+import shutil
 import subprocess
-from gi import require_version
 import urllib.parse
 
-require_version('Nautilus', '4.0')
-require_version('Gtk', '4.0')
+from gi import require_version
+
+require_version("Nautilus", "4.0")
+require_version("Gtk", "4.0")
 
 TERMINAL_NAME = "com.raggesilver.BlackBox"
 
-from gi.repository import Nautilus, GObject
 from gettext import gettext
+
+from gi.repository import GObject, Nautilus
 
 
 class BlackBoxNautilus(GObject.GObject, Nautilus.MenuProvider):
@@ -23,7 +26,7 @@ class BlackBoxNautilus(GObject.GObject, Nautilus.MenuProvider):
         """Return to menu when click on any file/folder"""
         if not self.only_one_file_info(files):
             return []
-        
+
         menu = []
         fileInfo = files[0]
         self.is_select = False
@@ -36,9 +39,8 @@ class BlackBoxNautilus(GObject.GObject, Nautilus.MenuProvider):
             print(f"Create a menu item for entry {dir_path}")
             menu_item = self._create_nautilus_item(dir_path)
             menu.append(menu_item)
-        
-        return menu
 
+        return menu
 
     def get_background_items(self, directory):
         """Returns the menu items to display when no file/folder is selected
@@ -49,7 +51,6 @@ class BlackBoxNautilus(GObject.GObject, Nautilus.MenuProvider):
         if self.is_select:
             self.is_select = False
             return []
-
 
         menu = []
         if directory.is_directory():
@@ -65,28 +66,35 @@ class BlackBoxNautilus(GObject.GObject, Nautilus.MenuProvider):
     def _create_nautilus_item(self, dir_path: str) -> Nautilus.MenuItem:
         """Creates the 'Open In BlackBox' menu item."""
 
-
-        item = Nautilus.MenuItem(name="BlackBoxNautilus::open_in_blackbox",
-                                    label=gettext("Open in BlackBox"),
-                                    tip=gettext("Open this folder/file in BlackBox Terminal"))
+        item = Nautilus.MenuItem(
+            name="BlackBoxNautilus::open_in_blackbox",
+            label=gettext("Open in BlackBox"),
+            tip=gettext("Open this folder/file in BlackBox Terminal"),
+        )
         print(f"Created item with path {dir_path}")
-
 
         item.connect("activate", self._nautilus_run, dir_path)
         print("Connect trigger to menu item")
 
         return item
 
+    def is_native(self):
+        return shutil.which("blackbox") is not None
+
     def _nautilus_run(self, menu, path):
         """'Open with BlackBox 's menu item callback."""
         print("Openning:", path)
-        
-        args = ['/usr/bin/flatpak', 'run', TERMINAL_NAME, '-w', path]
+        args = None
+        if self.is_native():
+            args = args = ["blackbox", "-w", path]
+        else:
+            args = ["/usr/bin/flatpak", "run", TERMINAL_NAME, "-w", path]
+
         subprocess.Popen(args, cwd=path)
 
     def get_abs_path(self, fileInfo: Nautilus.FileInfo):
         uri = fileInfo.get_uri()
-        path = uri.replace('file://','')
+        path = uri.replace("file://", "")
 
         return urllib.parse.unquote(path)
 

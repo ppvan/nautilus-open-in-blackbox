@@ -1,6 +1,6 @@
 #!/usr/bin/bash
 
-EXT_PATH=blackbox_extension.py
+EXT_PATH=nautilus-open-in-blackbox.py
 
 restart_nautilus() {
     read -p "Restart Nautilus(Files)? [Y/n]" ans
