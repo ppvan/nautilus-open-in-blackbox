@@ -64,12 +64,12 @@ class BlackBoxNautilus(GObject.GObject, Nautilus.MenuProvider):
         return menu
 
     def _create_nautilus_item(self, dir_path: str) -> Nautilus.MenuItem:
-        """Creates the 'Open In BlackBox' menu item."""
+        """Creates the 'Open In Black Box' menu item."""
 
         item = Nautilus.MenuItem(
             name="BlackBoxNautilus::open_in_blackbox",
-            label=gettext("Open in BlackBox"),
-            tip=gettext("Open this folder/file in BlackBox Terminal"),
+            label=gettext("Open in Black Box"),
+            tip=gettext("Open this folder/file in Black Box Terminal"),
         )
         print(f"Created item with path {dir_path}")
 
@@ -82,7 +82,7 @@ class BlackBoxNautilus(GObject.GObject, Nautilus.MenuProvider):
         return shutil.which("blackbox") == "/usr/bin/blackbox"
 
     def _nautilus_run(self, menu, path):
-        """'Open with BlackBox 's menu item callback."""
+        """'Open with Black Box 's menu item callback."""
         print("Openning:", path)
         args = None
         if self.is_native():
