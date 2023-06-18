@@ -1,5 +1,4 @@
-#!/usr/bin/python
-
+#!/usr/bin/python3
 import shutil
 import subprocess
 import urllib.parse
@@ -11,9 +10,14 @@ require_version("Gtk", "4.0")
 
 TERMINAL_NAME = "com.raggesilver.BlackBox"
 
+import logging
+import os
 from gettext import gettext
 
 from gi.repository import GObject, Nautilus
+
+if os.environ.get("NAUTILUS_BLACKBOX_DEBUG", "False") == "True":
+    logging.basicConfig(level=logging.DEBUG)
 
 
 class BlackBoxNautilus(GObject.GObject, Nautilus.MenuProvider):
@@ -35,8 +39,8 @@ class BlackBoxNautilus(GObject.GObject, Nautilus.MenuProvider):
             self.is_select = True
             dir_path = self.get_abs_path(fileInfo)
 
-            print("Selecting a directory!!")
-            print(f"Create a menu item for entry {dir_path}")
+            logging.debug("Selecting a directory!!")
+            logging.debug(f"Create a menu item for entry {dir_path}")
             menu_item = self._create_nautilus_item(dir_path)
             menu.append(menu_item)
 
@@ -56,8 +60,8 @@ class BlackBoxNautilus(GObject.GObject, Nautilus.MenuProvider):
         if directory.is_directory():
             dir_path = self.get_abs_path(directory)
 
-            print("Not thing is selected. Launch from backgrounds!!")
-            print(f"Create a menu item for entry {dir_path}")
+            logging.debug("Not thing is selected. Launch from backgrounds!!")
+            logging.debug(f"Create a menu item for entry {dir_path}")
             menu_item = self._create_nautilus_item(dir_path)
             menu.append(menu_item)
 
@@ -71,10 +75,10 @@ class BlackBoxNautilus(GObject.GObject, Nautilus.MenuProvider):
             label=gettext("Open in BlackBox"),
             tip=gettext("Open this folder/file in BlackBox Terminal"),
         )
-        print(f"Created item with path {dir_path}")
+        logging.debug(f"Created item with path {dir_path}")
 
         item.connect("activate", self._nautilus_run, dir_path)
-        print("Connect trigger to menu item")
+        logging.debug("Connect trigger to menu item")
 
         return item
 
@@ -83,7 +87,7 @@ class BlackBoxNautilus(GObject.GObject, Nautilus.MenuProvider):
 
     def _nautilus_run(self, menu, path):
         """'Open with BlackBox 's menu item callback."""
-        print("Openning:", path)
+        logging.debug("Openning:", path)
         args = None
         if self.is_native():
             args = args = ["blackbox", "-w", path]
