@@ -1,7 +1,8 @@
 # OpenInBlackBox
 
 <p>Simple script to open my favorite terminal <a href="https://gitlab.gnome.org/raggesilver/blackbox">Black Box</a> from Nautilus (Gnome Files) Menu</p>
----
+
+
 <p align="center">
   <img src="https://raw.githubusercontent.com/phucnoob/OpenInBlackBox/main/preview.png" />
 </p>
