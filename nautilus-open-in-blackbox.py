@@ -83,14 +83,19 @@ class BlackBoxNautilus(GObject.GObject, Nautilus.MenuProvider):
         return item
 
     def is_native(self):
-        return shutil.which("blackbox") == "/usr/bin/blackbox"
+        if shutil.which("blackbox-terminal") == "/usr/bin/blackbox-terminal":
+            return "blackbox-terminal"
+        if shutil.which("blackbox") == "/usr/bin/blackbox":
+            return "blackbox"
 
     def _nautilus_run(self, menu, path):
         """'Open with Black Box 's menu item callback."""
         logging.debug("Openning:", path)
         args = None
-        if self.is_native():
-            args = args = ["blackbox", "-w", path]
+        if self.is_native()=="blackbox-terminal":
+            args = ["blackbox-terminal", "-w", path]
+        elif self.is_native()=="blackbox":
+            args = ["blackbox", "-w", path]
         else:
             args = ["/usr/bin/flatpak", "run", TERMINAL_NAME, "-w", path]
 
