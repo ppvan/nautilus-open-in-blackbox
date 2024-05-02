@@ -102,10 +102,8 @@ class BlackBoxNautilus(GObject.GObject, Nautilus.MenuProvider):
         subprocess.Popen(args, cwd=path)
 
     def get_abs_path(self, fileInfo: Nautilus.FileInfo):
-        uri = fileInfo.get_uri()
-        path = uri.replace("file://", "")
-
-        return urllib.parse.unquote(path)
+        path = fileInfo.get_location().get_path()
+        return path
 
     def only_one_file_info(self, files: list[Nautilus.FileInfo]):
         return len(files) == 1
