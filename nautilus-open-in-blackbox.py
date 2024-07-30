@@ -2,6 +2,7 @@
 import shutil
 import subprocess
 import urllib.parse
+import locale
 
 from gi import require_version
 
@@ -70,10 +71,23 @@ class BlackBoxNautilus(GObject.GObject, Nautilus.MenuProvider):
     def _create_nautilus_item(self, dir_path: str) -> Nautilus.MenuItem:
         """Creates the 'Open In Black Box' menu item."""
 
+        match locale.getlocale()[0].split("_")[0]:
+            case "fr":
+                text_label="Ouvrir dans Black Box"
+            case "ar":
+                text_label="(Black Box) الفتح فب العابة السوداء"
+            case _:
+                text_label="Open in Black Box"
+        match locale.getlocale()[0].split("_")[0]:
+            case "fr":
+                text_tip="Ouvrir ce fichier/dossier dans Black Box"
+            case _:
+                text_tip="Open this folder/file in Black Box Terminal"
+
         item = Nautilus.MenuItem(
             name="BlackBoxNautilus::open_in_blackbox",
-            label=gettext("Open in Black Box"),
-            tip=gettext("Open this folder/file in Black Box Terminal"),
+            label=gettext(text_label),
+            tip=gettext(text_tip),
         )
         logging.debug(f"Created item with path {dir_path}")
 
