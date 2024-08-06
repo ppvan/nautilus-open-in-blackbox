@@ -76,11 +76,15 @@ class BlackBoxNautilus(GObject.GObject, Nautilus.MenuProvider):
                 text_label="Ouvrir dans Black Box"
             case "ar":
                 text_label="(Black Box) الفتح فب العابة السوداء"
+            case "pt":
+                text_label="Abrir no Black Box"
             case _:
                 text_label="Open in Black Box"
         match locale.getlocale()[0].split("_")[0]:
             case "fr":
                 text_tip="Ouvrir ce fichier/dossier dans Black Box"
+            case "pt":
+                text_tip="Abrir esta pasta/arquivo no terminal Black Box"
             case _:
                 text_tip="Open this folder/file in Black Box Terminal"
 
