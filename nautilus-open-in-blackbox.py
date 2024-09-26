@@ -72,6 +72,8 @@ class BlackBoxNautilus(GObject.GObject, Nautilus.MenuProvider):
         """Creates the 'Open In Black Box' menu item."""
 
         match locale.getlocale()[0].split("_")[0]:
+            case "zh":
+                text_label="在 Black Box 打开"
             case "fr":
                 text_label="Ouvrir dans Black Box"
             case "ar":
