@@ -1,129 +1,116 @@
 #!/usr/bin/python3
-import shutil
-import subprocess
-import urllib.parse
 import locale
-
-from gi import require_version
-
-require_version("Nautilus", "4.0")
-require_version("Gtk", "4.0")
-
-TERMINAL_NAME = "com.raggesilver.BlackBox"
-
-import logging
 import os
-from gettext import gettext
+import subprocess
+from typing import List
 
-from gi.repository import GObject, Nautilus
+from gi.repository import GObject, Nautilus  # noqa: E402
 
-if os.environ.get("NAUTILUS_BLACKBOX_DEBUG", "False") == "True":
-    logging.basicConfig(level=logging.DEBUG)
+TRANSLATIONS = {
+    "zh": {
+        "label": "在 Black Box 打开",
+        "tip": "Open this folder/file in Black Box Terminal",
+    },
+    "fr": {
+        "label": "Ouvrir dans Black Box",
+        "tip": "Ouvrir ce fichier/dossier dans Black Box",
+    },
+    "ar": {
+        "label": "(Black Box) الفتح فب العابة السوداء",
+        "tip": "Open this folder/file in Black Box Terminal",
+    },
+    "pt": {
+        "label": "Abrir no Black Box",
+        "tip": "Abrir esta pasta/arquivo no terminal Black Box",
+    },
+    "default": {
+        "label": "Open in Black Box",
+        "tip": "Open this folder/file in Black Box Terminal",
+    },
+}
 
 
-class BlackBoxNautilus(GObject.GObject, Nautilus.MenuProvider):
-    def __init__(self):
-        super().__init__()
-        self.is_select = False
-        pass
-
-    def get_file_items(self, files: list[Nautilus.FileInfo]):
-        """Return to menu when click on any file/folder"""
-        if not self.only_one_file_info(files):
+class OpenBlackboxTerminalExtension(GObject.GObject, Nautilus.MenuProvider):
+    def get_file_items(self, files: List[Nautilus.FileInfo]) -> List[Nautilus.MenuItem]:
+        """Only add terminal menu if user only select a single file/directory"""
+        if len(files) != 1:
             return []
 
-        menu = []
         fileInfo = files[0]
-        self.is_select = False
+        if not fileInfo.is_directory():
+            return []
 
-        if fileInfo.is_directory():
-            self.is_select = True
-            dir_path = self.get_abs_path(fileInfo)
+        item = self._create_open_terminal_menuitem_file(fileInfo)
 
-            logging.debug("Selecting a directory!!")
-            logging.debug(f"Create a menu item for entry {dir_path}")
-            menu_item = self._create_nautilus_item(dir_path)
-            menu.append(menu_item)
+        return [item]
 
-        return menu
-
-    def get_background_items(self, directory):
+    def get_background_items(self, cwd: Nautilus.FileInfo) -> List[Nautilus.MenuItem]:
         """Returns the menu items to display when no file/folder is selected
         (i.e. when right-clicking the background)."""
-        # Some concurrency problem fix.
-        # when you select a directory, and right mouse, nautilus will call this
-        # once the moments you focus the menu. This code to ignore that time.
-        if self.is_select:
-            self.is_select = False
+
+        if not cwd.is_directory():
             return []
 
-        menu = []
-        if directory.is_directory():
-            dir_path = self.get_abs_path(directory)
+        item = self._create_open_terminal_menuitem_background(cwd)
 
-            logging.debug("Not thing is selected. Launch from backgrounds!!")
-            logging.debug(f"Create a menu item for entry {dir_path}")
-            menu_item = self._create_nautilus_item(dir_path)
-            menu.append(menu_item)
+        return [item]
 
-        return menu
-
-    def _create_nautilus_item(self, dir_path: str) -> Nautilus.MenuItem:
+    def _create_open_terminal_menuitem_file(
+        self, fileInfo: Nautilus.FileInfo
+    ) -> Nautilus.MenuItem:
         """Creates the 'Open In Black Box' menu item."""
 
-        match locale.getlocale()[0].split("_")[0]:
-            case "zh":
-                text_label="在 Black Box 打开"
-            case "fr":
-                text_label="Ouvrir dans Black Box"
-            case "ar":
-                text_label="(Black Box) الفتح فب العابة السوداء"
-            case "pt":
-                text_label="Abrir no Black Box"
-            case _:
-                text_label="Open in Black Box"
-        match locale.getlocale()[0].split("_")[0]:
-            case "fr":
-                text_tip="Ouvrir ce fichier/dossier dans Black Box"
-            case "pt":
-                text_tip="Abrir esta pasta/arquivo no terminal Black Box"
-            case _:
-                text_tip="Open this folder/file in Black Box Terminal"
+        lang = locale.getlocale()[0].split("_")[0]  # en, fr, vi...
+        label = TRANSLATIONS[lang]["label"]
+        tip = TRANSLATIONS[lang]["tip"]
 
         item = Nautilus.MenuItem(
-            name="BlackBoxNautilus::open_in_blackbox",
-            label=gettext(text_label),
-            tip=gettext(text_tip),
+            name="BlackBoxNautilus::open_in_blackbox1",
+            label=label,
+            tip=tip,
         )
-        logging.debug(f"Created item with path {dir_path}")
 
-        item.connect("activate", self._nautilus_run, dir_path)
-        logging.debug("Connect trigger to menu item")
-
+        item.connect("activate", self._open_terminal, fileInfo)
         return item
 
-    def is_native(self):
-        if shutil.which("blackbox-terminal") == "/usr/bin/blackbox-terminal":
-            return "blackbox-terminal"
-        if shutil.which("blackbox") == "/usr/bin/blackbox":
-            return "blackbox"
+    def _create_open_terminal_menuitem_background(
+        self, fileInfo: Nautilus.FileInfo
+    ) -> Nautilus.MenuItem:
+        """Creates the 'Open In Black Box' menu item."""
+        lang = locale.getlocale()[0].split("_")[0]  # en, fr, vi...
+        label = TRANSLATIONS[lang]["label"]
+        tip = TRANSLATIONS[lang]["tip"]
 
-    def _nautilus_run(self, menu, path):
-        """'Open with Black Box 's menu item callback."""
-        logging.debug("Openning:", path)
-        args = None
-        if self.is_native()=="blackbox-terminal":
-            args = ["blackbox-terminal", "-w", path]
-        elif self.is_native()=="blackbox":
-            args = ["blackbox", "-w", path]
+        item = Nautilus.MenuItem(
+            name="BlackBoxNautilus::open_in_blackbox2",
+            label=label,
+            tip=tip,
+        )
+
+        item.connect("activate", self._open_terminal, fileInfo)
+        return item
+
+    def _open_terminal(
+        self, menu: Nautilus.MenuItem, working_dir: Nautilus.FileInfo
+    ) -> None:
+        """Open with Black Box 's menu item callback."""
+        cwd = working_dir.get_location().get_path()
+        possible_locations = [
+            "/usr/bin/blackbox-terminal",
+            "/usr/bin/blackbox",
+        ]
+
+        for command in possible_locations:
+            if os.path.exists(command) and os.access(command, os.X_OK):
+                subprocess.Popen([command, "--working-directory", cwd])
+                break
         else:
-            args = ["/usr/bin/flatpak", "run", TERMINAL_NAME, "-w", path]
-
-        subprocess.Popen(args, cwd=path)
-
-    def get_abs_path(self, fileInfo: Nautilus.FileInfo):
-        path = fileInfo.get_location().get_path()
-        return path
-
-    def only_one_file_info(self, files: list[Nautilus.FileInfo]):
-        return len(files) == 1
+            subprocess.Popen(
+                [
+                    "/usr/bin/flatpak",
+                    "run",
+                    "com.raggesilver.BlackBox",
+                    "--working-directory",
+                    cwd,
+                ]
+            )
