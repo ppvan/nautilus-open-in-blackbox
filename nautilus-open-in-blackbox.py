@@ -4,7 +4,7 @@ import os
 import subprocess
 from typing import List
 
-from gi.repository import GObject, Nautilus  # noqa: E402
+from gi.repository import GObject, Nautilus
 
 TRANSLATIONS = {
     "zh": {
