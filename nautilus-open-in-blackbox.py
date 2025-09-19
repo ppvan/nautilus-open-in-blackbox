@@ -62,13 +62,11 @@ class OpenBlackboxTerminalExtension(GObject.GObject, Nautilus.MenuProvider):
 
         lang = locale.getlocale()[0].split("_")[0]  # en, fr, vi...
         translation = TRANSLATIONS.get(lang, TRANSLATIONS["default"])
-        label = translation["label"]
-        tip = translation["tip"]
 
         item = Nautilus.MenuItem(
             name="BlackBoxNautilus::open_in_blackbox1",
-            label=label,
-            tip=tip,
+            label=translation["label"],
+            tip=translation["tip"],
         )
 
         item.connect("activate", self._open_terminal, fileInfo)
@@ -80,13 +78,11 @@ class OpenBlackboxTerminalExtension(GObject.GObject, Nautilus.MenuProvider):
         """Creates the 'Open In Black Box' menu item."""
         lang = locale.getlocale()[0].split("_")[0]  # en, fr, vi...
         translation = TRANSLATIONS.get(lang, TRANSLATIONS["default"])
-        label = translation["label"]
-        tip = translation["tip"]
 
         item = Nautilus.MenuItem(
             name="BlackBoxNautilus::open_in_blackbox2",
-            label=label,
-            tip=tip,
+            label=translation["label"],
+            tip=translation["tip"],
         )
 
         item.connect("activate", self._open_terminal, fileInfo)
